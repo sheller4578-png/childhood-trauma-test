@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>童年创伤测试问卷</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .question-section {
+            margin-bottom: 30px;
+        }
+        
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .question-text {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-label:hover {
+            border-color: #667eea;
+            background-color: #f5f5f5;
+        }
+        
+        .option-label input[type="radio"] {
+            margin-right: 12px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .option-label input[type="radio"]:checked + span {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .option-label input[type="radio"]:checked {
+            accent-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .reset-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .result-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>童年创伤测试问卷</h1>
+            <p class="subtitle">根据您的实际情况选择，帮助了解您的心理状态</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <form id="questionnaire">
+            <div id="questionsContainer"></div>
+            
+            <div class="button-group">
+                <button type="submit" class="submit-btn">提交问卷</button>
+                <button type="reset" class="reset-btn">重置</button>
+            </div>
+        </form>
+        
+        <div class="result" id="result">
+            <h2>测试结果</h2>
+            <div class="result-score" id="resultScore">0</div>
+            <div class="result-text" id="resultText"></div>
+            <button class="reset-btn" onclick="location.reload()">重新测试</button>
+        </div>
+    </div>
+    
+    <script>
+        // 问卷题目
+        const questions = [
+            {
+                id: 1,
+                text: "您在童年时期是否经历过身体虐待、忽视或缺乏照顾？",
+                options: ["从未", "偶尔", "经常", "非常频繁"]
+            },
+            {
+                id: 2,
+                text: "您是否在童年遭受过言语羞辱或心理伤害？",
+                options: ["从未", "偶尔", "经常", "非常频繁"]
+            },
+            {
+                id: 3,
+                text: "您的家庭环境是否充满冲突或不稳定？",
+                options: ["从未", "偶尔", "经常", "非常频繁"]
+            },
+            {
+                id: 4,
+                text: "您是否失去过重要的亲人或经历过分离？",
+                options: ["从未", "偶尔", "经常", "非常频繁"]
+            },
+            {
+                id: 5,
+                text: "您在童年是否感到被抛弃或不被爱？",
+                options: ["从未", "偶尔", "经常", "非常频繁"]
+            },
+            {
+                id: 6,
+                text: "您现在是否仍然感到与童年创伤相关的焦虑或抑郁？",
+                options: ["从未", "很少", "有时", "经常"]
+            },
+            {
+                id: 7,
+                text: "您的人际关系是否受到童年经历的影响？",
+                options: ["没有影响", "轻微影响", "中等影响", "严重影响"]
+            },
+            {
+                id: 8,
+                text: "您是否寻求过专业心理健康帮助？",
+                options: ["从未", "考虑过", "正在进行", "已完成治疗"]
+            }
+        ];
+        
+        // 初始化问卷
+        function initQuestionnaire() {
+            const container = document.getElementById('questionsContainer');
+            
+            questions.forEach((question, index) => {
+                const section = document.createElement('div');
+                section.className = 'question-section';
+                
+                let optionsHTML = '';
+                question.options.forEach((option, optionIndex) => {
+                    optionsHTML += `
+                        <label class="option-label">
+                            <input type="radio" name="q${question.id}" value="${optionIndex}" required>
+                            <span>${option}</span>
+                        </label>
+                    `;
+                });
+                
+                section.innerHTML = `
+                    <div class="question-number">第 ${index + 1} 题 / 共 ${questions.length} 题</div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options">${optionsHTML}</div>
+                `;
+                
+                container.appendChild(section);
+            });
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            const total = questions.length;
+            const percentage = (answered / total) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+        
+        // 提交问卷
+        document.getElementById('questionnaire').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            questions.forEach(question => {
+                const checked = document.querySelector(`input[name="q${question.id}"]:checked`);
+                if (checked) {
+                    score += parseInt(checked.value);
+                }
+            });
+            
+            // 计算结果
+            const maxScore = 21; // 最高分数
+            const percentage = (score / maxScore) * 100;
+            
+            let resultText = '';
+            if (percentage < 25) {
+                resultText = '✅ 您的童年创伤程度较轻。建议继续保持积极心态，适当进行心理调适。';
+            } else if (percentage < 50) {
+                resultText = '⚠️ 您可能经历过中等程度的童年创伤。建议考虑寻求专业心理咨询帮助。';
+            } else if (percentage < 75) {
+                resultText = '🔴 您可能经历过较重的童年创伤。强烈建议寻求专业心理治疗师的帮助。';
+            } else {
+                resultText = '🆘 您可能经历过严重的童年创伤。请立即寻求专业心理卫生工作者的帮助。';
+            }
+            
+            // 显示结果
+            document.getElementById('questionnaire').style.display = 'none';
+            const resultDiv = document.getElementById('result');
+            resultDiv.querySelector('#resultScore').textContent = score + ' / 21';
+            resultDiv.querySelector('#resultText').textContent = resultText;
+            resultDiv.classList.add('show');
+        });
+        
+        // 监听单选框变化更新进度
+        document.addEventListener('change', updateProgress);
+        
+        // 初始化
+        initQuestionnaire();
+    </script>
+</body>
+</html>
